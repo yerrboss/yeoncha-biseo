@@ -541,13 +541,16 @@ function generateFullYearView(year) {
       }
 
       // When a day with a holiday is clicked, show the holiday caption below the month's grid
-      dayButton.onclick = () => {
+      dayButton.onclick = (event) => {
         const holidayCaptionDiv = document.getElementById(`holiday-caption-${index}`);
         if (isHoliday) {
           holidayCaptionDiv.innerHTML = `Holiday: ${holidays2025[`${index + 1}-${day}`]} (${index + 1}-${day})`;
         } else {
           holidayCaptionDiv.innerHTML = ""; // Clear caption if a non-holiday is clicked
         }
+
+        // Prevent click event from propagating to the document
+        event.stopPropagation();
       };
 
       monthGrid.appendChild(dayButton);
@@ -562,6 +565,20 @@ function generateFullYearView(year) {
     monthDiv.appendChild(monthGrid);
     monthDiv.appendChild(holidayCaptionDiv); // Append the caption div at the bottom of the month
     fullYearView.appendChild(monthDiv);
+  });
+
+  // Add a global click event listener to hide captions when clicking elsewhere
+  document.addEventListener("click", (event) => {
+    // Find all the holiday caption divs
+    const holidayCaptionDivs = document.querySelectorAll(".holiday-caption");
+    const clickedInsideHolidayButton = event.target.classList.contains("holiday");
+
+    // If the click was outside any holiday caption or holiday button, hide all captions
+    if (!clickedInsideHolidayButton) {
+      holidayCaptionDivs.forEach((div) => {
+        div.innerHTML = ""; // Clear all holiday captions
+      });
+    }
   });
 }
 
