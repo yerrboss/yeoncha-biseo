@@ -281,7 +281,6 @@
       }
     </style>
   </head>
-<body>
 <!-- Add these forms before the existing calendar HTML -->
 <!DOCTYPE html>
 <html lang="en">
@@ -513,6 +512,8 @@ function generateFullYearView(year) {
       monthGrid.appendChild(emptyDiv);
     }
 
+    const holidayCaptions = [];
+
     for (let day = 1; day <= daysInMonth; day++) {
       const dayButton = document.createElement("div");
       const dateString = `${index + 1}-${day}-${year}`;
@@ -525,7 +526,10 @@ function generateFullYearView(year) {
       const isHoliday = holidays2025[`${index + 1}-${day}`];
 
       if (isWeekend) dayButton.classList.add("weekend");
-      if (isHoliday) dayButton.classList.add("holiday");
+      if (isHoliday) {
+        dayButton.classList.add("holiday");
+        holidayCaptions.push(`Holiday: ${holidays2025[`${index + 1}-${day}`]} (${index + 1}-${day})`);
+      }
       if (notes[dateString] && notes[dateString].length > 0) {
         dayButton.classList.add("has-note");
       }
@@ -536,14 +540,27 @@ function generateFullYearView(year) {
         dayButton.classList.add("color-monthlyleave");
       }
 
+      // When a day with a holiday is clicked, show the holiday caption below the month's grid
       dayButton.onclick = () => {
-        showNoteModal(dateString);
+        const holidayCaptionDiv = document.getElementById(`holiday-caption-${index}`);
+        if (isHoliday) {
+          holidayCaptionDiv.innerHTML = `Holiday: ${holidays2025[`${index + 1}-${day}`]} (${index + 1}-${day})`;
+        } else {
+          holidayCaptionDiv.innerHTML = ""; // Clear caption if a non-holiday is clicked
+        }
       };
 
       monthGrid.appendChild(dayButton);
     }
 
+    // Add a holiday caption div at the bottom of the month
+    const holidayCaptionDiv = document.createElement("div");
+    holidayCaptionDiv.classList.add("holiday-caption");
+    holidayCaptionDiv.id = `holiday-caption-${index}`;
+    holidayCaptionDiv.innerHTML = ""; // Initially empty, will be filled when a holiday is clicked
+
     monthDiv.appendChild(monthGrid);
+    monthDiv.appendChild(holidayCaptionDiv); // Append the caption div at the bottom of the month
     fullYearView.appendChild(monthDiv);
   });
 }
