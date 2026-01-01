@@ -293,7 +293,7 @@
 <div class="calendar-container" id="singleMonthView">
   <div class="header">
     <button id="prevMonth">&lt;</button>
-    <div id="monthYear">January 2025</div>
+    <div id="monthYear">January 2026</div>
     <button id="nextMonth">&gt;</button>
     <button id="toggleViewBtn">Show Full Year</button>
   </div>
@@ -336,29 +336,31 @@
 <button id="resetBtn">Reset</button> <!-- Added Reset Button -->
 
 <script>
-const holidays2025 = {
+const holidays2026 = {
   "1-1": "설날",
-  "1-27": "임시휴일!!!",
-  "1-28": "설날",
-  "1-29": "설날",
-  "1-30": "설날",
-  "3-3": "대체휴일",
-  "5-1": "근로자의 날",
+  "2-16": "설날연휴",
+  "2-17": "설날",
+  "2-18": "설날 연휴",
+  "3-1": "삼일절",
+  "3-2": "대체휴일",
   "5-5": "어린이날",
-  "5-6": "대체휴일",
-  "6-6": "헌충일",
+  "5-24": "부처핸즈업",
+  "5-25": "대체공휴일",
   "8-15": "광복절",
+  "8-17": "대체공휴일",
+  "9-24": "추석",
+  "9-25": "추석",
+  "9-26": "추석",
+  "9-27": "추석",
   "10-3": "개천절",
-  "10-6": "추석",
-  "10-7": "추석",
-  "10-8": "대체휴일",
+  "10-5": "대체공휴일",
   "10-9": "한글날",
   "12-25": "크리스마스",
 };
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 let currentMonth = parseInt(localStorage.getItem('currentMonth')) || 0;
-let currentYear = parseInt(localStorage.getItem('currentYear')) || 2025;
+let currentYear = parseInt(localStorage.getItem('currentYear')) || 2026;
 let notes = JSON.parse(localStorage.getItem('notes')) || {};
 let daysOffTotal = parseInt(localStorage.getItem('daysOffTotal')) || 0;
 let daysOffUsed = parseInt(localStorage.getItem('daysOffUsed')) || 0;
@@ -450,7 +452,7 @@ function generateCalendar(month, year) {
     const isWeekend =
       (firstDayOfMonth + day - 1) % 7 === 0 ||
       (firstDayOfMonth + day - 1) % 7 === 6;
-    const isHoliday = holidays2025[`${month + 1}-${day}`];
+    const isHoliday = holidays2026[`${month + 1}-${day}`];
 
     dayButton.textContent = day;
     dayButton.classList.add("day");
@@ -468,7 +470,7 @@ function generateCalendar(month, year) {
       showNoteModal(dateString);
       if (isHoliday) {
         holidayCaption.textContent = `Holiday: ${
-          holidays2025[`${month + 1}-${day}`]
+          holidays2026[`${month + 1}-${day}`]
         } (${month + 1}-${day})`;
       } else {
         holidayCaption.textContent = "";
@@ -523,12 +525,12 @@ function generateFullYearView(year) {
       const isWeekend =
         (firstDayOfMonth + day - 1) % 7 === 0 ||
         (firstDayOfMonth + day - 1) % 7 === 6;
-      const isHoliday = holidays2025[`${index + 1}-${day}`];
+      const isHoliday = holidays2026[`${index + 1}-${day}`];
 
       if (isWeekend) dayButton.classList.add("weekend");
       if (isHoliday) {
         dayButton.classList.add("holiday");
-        holidayCaptions.push(`Holiday: ${holidays2025[`${index + 1}-${day}`]} (${index + 1}-${day})`);
+        holidayCaptions.push(`Holiday: ${holidays2026[`${index + 1}-${day}`]} (${index + 1}-${day})`);
       }
       if (notes[dateString] && notes[dateString].length > 0) {
         dayButton.classList.add("has-note");
@@ -544,7 +546,7 @@ function generateFullYearView(year) {
       dayButton.onclick = (event) => {
         const holidayCaptionDiv = document.getElementById(`holiday-caption-${index}`);
         if (isHoliday) {
-          holidayCaptionDiv.innerHTML = `Holiday: ${holidays2025[`${index + 1}-${day}`]} (${index + 1}-${day})`;
+          holidayCaptionDiv.innerHTML = `Holiday: ${holidays2026[`${index + 1}-${day}`]} (${index + 1}-${day})`;
         } else {
           holidayCaptionDiv.innerHTML = ""; // Clear caption if a non-holiday is clicked
         }
@@ -750,7 +752,7 @@ function cancelLeave(date) {
 
     if (calendarDay.classList.contains("weekend")) {
       calendarDay.style.backgroundColor = "";
-    } else if (holidays2025[`${month}-${day}`]) {
+    } else if (holidays2026[`${month}-${day}`]) {
       calendarDay.classList.add("holiday");
     } else {
       calendarDay.style.backgroundColor = "";
