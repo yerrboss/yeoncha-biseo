@@ -360,7 +360,7 @@ const holidays2026 = {
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 let currentMonth = parseInt(localStorage.getItem('currentMonth')) || 0;
-let currentYear = parseInt(localStorage.getItem('currentYear')) || 2026;
+let currentYear = parseInt(localStorage.getItem('currentYear')) || new Date().getFullYear();  // ← THIS LINE FIXED
 let notes = JSON.parse(localStorage.getItem('notes')) || {};
 let daysOffTotal = parseInt(localStorage.getItem('daysOffTotal')) || 0;
 let daysOffUsed = parseInt(localStorage.getItem('daysOffUsed')) || 0;
