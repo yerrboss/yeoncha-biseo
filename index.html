@@ -38,17 +38,19 @@
         overflow-x: auto;
         overflow-y: hidden;
       }
-      .month-container {
-        padding: 10px;
-        border-radius: 12px;
-        background-color: #f7f9fb;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-      }
+.month-container {
+  padding: 20px 10px;
+  border-radius: 12px;
+  background-color: #f7f9fb;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* keep centered horizontally */
+  justify-content: flex-start; /* <— fixes extra vertical spread */
+  gap: 12px;               /* adds uniform, small spacing */
+}
+
       .month-container h4 {
         margin: 10px 0;
         font-weight: 600;
@@ -208,6 +210,7 @@
         margin-left: 10px;
         margin-bottom: 10px;
       }
+      
 
       @media (max-width: 600px) {
         .modal-content {
@@ -279,6 +282,8 @@
         border: 1px solid #ccc;
         border-radius: 4px;
       }
+
+
     </style>
   </head>
 <!-- Add these forms before the existing calendar HTML -->
