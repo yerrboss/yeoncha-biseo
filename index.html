@@ -492,96 +492,72 @@ function generateFullYearView(year) {
   monthNames.forEach((monthName, index) => {
     const monthDiv = document.createElement("div");
     monthDiv.classList.add("month-container");
-    const monthTitle = document.createElement("h4");
-    monthTitle.textContent = `${monthName} ${year}`;
-    monthDiv.appendChild(monthTitle);
+
+    const title = document.createElement("h4");
+    title.textContent = `${monthName} ${year}`;
+    monthDiv.appendChild(title);
 
     const monthGrid = document.createElement("div");
     monthGrid.classList.add("calendar-grid");
 
-    const firstDayOfMonth = new Date(year, index, 1).getDay();
-    const daysInMonth = new Date(year, index + 1, 0).getDate();
+    const firstDay = new Date(year, index, 1).getDay();
+    const totalDays = new Date(year, index + 1, 0).getDate();
 
-    daysOfWeek.forEach((day) => {
-      const dayHeader = document.createElement("div");
-      dayHeader.textContent = day;
-      dayHeader.classList.add("day-header");
-      monthGrid.appendChild(dayHeader);
+    // Week headers
+    daysOfWeek.forEach(d => {
+      const h = document.createElement("div");
+      h.textContent = d;
+      h.classList.add("day-header");
+      monthGrid.appendChild(h);
     });
 
-    for (let i = 0; i < firstDayOfMonth; i++) {
-      const emptyDiv = document.createElement("div");
-      monthGrid.appendChild(emptyDiv);
+    // Empty placeholders before 1st
+    for (let i = 0; i < firstDay; i++) {
+      monthGrid.appendChild(document.createElement("div"));
     }
 
-    const holidayCaptions = [];
+    for (let d = 1; d <= totalDays; d++) {
+      const dateKey = `${index + 1}-${d}-${year}`;
+      const wd = (firstDay + d - 1) % 7;
+      const isWeekend = wd === 0 || wd === 6;
+      const isHoliday = holidays2026[`${index + 1}-${d}`];
 
-    for (let day = 1; day <= daysInMonth; day++) {
-      const dayButton = document.createElement("div");
-      const dateString = `${index + 1}-${day}-${year}`;
-      dayButton.textContent = day;
-      dayButton.classList.add("day");
+      const cell = document.createElement("div");
+      cell.textContent = d;
+      cell.classList.add("day");
 
-      const isWeekend =
-        (firstDayOfMonth + day - 1) % 7 === 0 ||
-        (firstDayOfMonth + day - 1) % 7 === 6;
-      const isHoliday = holidays2026[`${index + 1}-${day}`];
+      if (isWeekend) cell.classList.add("weekend");
+      if (isHoliday) cell.classList.add("holiday");
+      if (notes[dateKey]?.length > 0) cell.classList.add("has-note");
+      if (isDayOff(dateKey)) cell.classList.add("color-연차");
+      if (ismonthlyleaveUsed(dateKey)) cell.classList.add("color-monthlyleave");
 
-      if (isWeekend) dayButton.classList.add("weekend");
-      if (isHoliday) {
-        dayButton.classList.add("holiday");
-        holidayCaptions.push(`Holiday: ${holidays2026[`${index + 1}-${day}`]} (${index + 1}-${day})`);
-      }
-      if (notes[dateString] && notes[dateString].length > 0) {
-        dayButton.classList.add("has-note");
-      }
+      // ✅ OPEN the modal for all day clicks
+      cell.addEventListener("click", e => {
+        e.stopPropagation();
+        showNoteModal(dateKey);
 
-      if (isDayOff(dateString)) {
-        dayButton.classList.add("color-연차");
-      } else if (ismonthlyleaveUsed(dateString)) {
-        dayButton.classList.add("color-monthlyleave");
-      }
+        // show holiday info if applicable (optional)
+        const caption = document.getElementById(`holiday-caption-${index}`);
+        caption.innerHTML = isHoliday
+          ? `Holiday: ${holidays2026[`${index + 1}-${d}`]} (${index + 1}-${d})`
+          : "";
+      });
 
-      // When a day with a holiday is clicked, show the holiday caption below the month's grid
-      dayButton.onclick = (event) => {
-        const holidayCaptionDiv = document.getElementById(`holiday-caption-${index}`);
-        if (isHoliday) {
-          holidayCaptionDiv.innerHTML = `Holiday: ${holidays2026[`${index + 1}-${day}`]} (${index + 1}-${day})`;
-        } else {
-          holidayCaptionDiv.innerHTML = ""; // Clear caption if a non-holiday is clicked
-        }
-
-        // Prevent click event from propagating to the document
-        event.stopPropagation();
-      };
-
-      monthGrid.appendChild(dayButton);
+      monthGrid.appendChild(cell);
     }
 
-    // Add a holiday caption div at the bottom of the month
-    const holidayCaptionDiv = document.createElement("div");
-    holidayCaptionDiv.classList.add("holiday-caption");
-    holidayCaptionDiv.id = `holiday-caption-${index}`;
-    holidayCaptionDiv.innerHTML = ""; // Initially empty, will be filled when a holiday is clicked
-
+    const captionDiv = document.createElement("div");
+    captionDiv.classList.add("holiday-caption");
+    captionDiv.id = `holiday-caption-${index}`;
     monthDiv.appendChild(monthGrid);
-    monthDiv.appendChild(holidayCaptionDiv); // Append the caption div at the bottom of the month
+    monthDiv.appendChild(captionDiv);
     fullYearView.appendChild(monthDiv);
   });
 
-  // Add a global click event listener to hide captions when clicking elsewhere
-  document.addEventListener("click", (event) => {
-    // Find all the holiday caption divs
-    const holidayCaptionDivs = document.querySelectorAll(".holiday-caption");
-    const clickedInsideHolidayButton = event.target.classList.contains("holiday");
-
-    // If the click was outside any holiday caption or holiday button, hide all captions
-    if (!clickedInsideHolidayButton) {
-      holidayCaptionDivs.forEach((div) => {
-        div.innerHTML = ""; // Clear all holiday captions
-      });
-    }
-  });
+  // make sure clicks outside cells clear captions
+  document.removeEventListener("click", hideHolidayCaptions, false);
+  document.addEventListener("click", hideHolidayCaptions, false);
 }
 
 function isDayOff(date) {
